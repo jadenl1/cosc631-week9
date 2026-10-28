@@ -1,0 +1,115 @@
+:root {
+  font-family: Arial, sans-serif;
+  color: #222;
+  background: white;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 24px;
+}
+h1 {
+  margin-bottom: 6px;
+  font-size: 26px;
+}
+h2 {
+  margin-top: 0;
+  font-size: 18px;
+}
+p {
+  line-height: 1.4;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+aside section + section {
+  margin-top: 30px;
+}
+svg {
+  width: 100%;
+  border: 1px solid #aaa;
+}
+.road {
+  stroke: #888;
+  stroke-width: 5;
+}
+.closed {
+  stroke: #a33;
+  stroke-dasharray: 8 6;
+}
+.location {
+  fill: white;
+  stroke: #555;
+  stroke-width: 2;
+}
+.robot {
+  fill: #2459a6;
+}
+svg text {
+  font-size: 15px;
+  fill: #222;
+  text-anchor: middle;
+}
+.controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+button,
+input,
+select {
+  font: inherit;
+}
+button {
+  padding: 5px 10px;
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+}
+.road-row,
+.package-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid #ddd;
+}
+.package-row button {
+  padding: 3px 6px;
+  font-size: 14px;
+}
+form {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+label {
+  display: grid;
+  gap: 4px;
+}
+input,
+select {
+  padding: 5px;
+}
+ol {
+  padding-left: 24px;
+}
+li {
+  padding: 3px;
+}
+li.current {
+  font-weight: bold;
+}
+@media (max-width: 700px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}

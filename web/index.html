@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Campus Delivery Planner</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+    <script src="/vendor/alpine.min.js" defer></script>
+  </head>
+  <body>
+    <main x-data="deliveryApp()">
+      <header>
+        <h1>Campus Delivery Planner</h1>
+        <p>Set up deliveries and let Prolog find a route.</p>
+      </header>
+      <div class="layout">
+        <section>
+          <h2>Campus map</h2>
+          <svg
+            viewBox="0 0 500 280"
+            role="img"
+            aria-label="Campus map showing roads and robot location"
+          >
+            <line
+              x1="100"
+              y1="65"
+              x2="400"
+              y2="65"
+              :class="roadClass('mailroom', 'library')"
+            ></line>
+            <line
+              x1="100"
+              y1="65"
+              x2="100"
+              y2="220"
+              :class="roadClass('mailroom', 'cafeteria')"
+            ></line>
+            <line
+              x1="400"
+              y1="65"
+              x2="400"
+              y2="220"
+              :class="roadClass('library', 'lab')"
+            ></line>
+            <line
+              x1="100"
+              y1="220"
+              x2="400"
+              y2="220"
+              :class="roadClass('cafeteria', 'lab')"
+            ></line>
+            <circle cx="100" cy="65" r="24" class="location"></circle>
+            <text x="100" y="111">mailroom</text>
+            <circle cx="400" cy="65" r="24" class="location"></circle>
+            <text x="400" y="111">library</text>
+            <circle cx="100" cy="220" r="24" class="location"></circle>
+            <text x="100" y="266">cafeteria</text>
+            <circle cx="400" cy="220" r="24" class="location"></circle>
+            <text x="400" y="266">lab</text>
+            <circle
+              :cx="positions[robot][0]"
+              :cy="positions[robot][1]"
+              r="11"
+              class="robot"
+            ></circle>
+          </svg>
+          <p
+            aria-live="polite"
+            x-text="`Robot: ${robot} · ${carrying ? 'carrying ' + carrying : 'carrying nothing'}`"
+          ></p>
+          <div class="controls">
+            <button id="run" @click="findPlan">Find plan</button>
+            <button
+              @click="nextStep"
+              :disabled="!actions.length || step >= actions.length"
+            >
+              Next step
+            </button>
+            <button
+              @click="togglePlayback"
+              :disabled="!actions.length || step >= actions.length"
+              x-text="timer ? 'Pause' : 'Play'"
+            ></button>
+            <button @click="restart" :disabled="!actions.length">
+              Start over
+            </button>
+          </div>
+          <p role="status" x-text="message"></p>
+          <ol>
+            <template x-for="(action, index) in actions" :key="index">
+              <li
+                :class="{ current: index === step - 1 }"
+                x-text="describe(action)"
+              ></li>
+            </template>
+          </ol>
+        </section>
+        <aside>
+          <section>
+            <h2>Roads</h2>
+            <p>Turn roads on or off.</p>
+            <template x-for="road in campus.roads" :key="road.id">
+              <div class="road-row">
+                <span x-text="`${road.origin} ↔ ${road.destination}`"></span>
+                <input
+                  type="checkbox"
+                  :checked="road.open"
+                  :aria-label="`${road.origin} to ${road.destination} open`"
+                  @change="changeRoad(road, $event.target.checked)"
+                />
+              </div>
+            </template>
+          </section>
+          <section>
+            <h2>Packages</h2>
+            <p x-show="!campus.packages.length">No packages yet.</p>
+            <template x-for="item in campus.packages" :key="item.id">
+              <div class="package-row">
+                <span
+                  x-text="`${item.name}: ${item.origin} → ${item.destination}`"
+                ></span>
+                <button
+                  @click="removePackage(item.id)"
+                  :aria-label="`Remove ${item.name}`"
+                >
+                  Remove
+                </button>
+              </div>
+            </template>
+            <form @submit.prevent="addPackage">
+              <label
+                >Package name<input
+                  x-model="newPackage.name"
+                  maxlength="40"
+                  required
+              /></label>
+              <label
+                >Pickup
+                <select x-model="newPackage.origin" required>
+                  <template x-for="location in campus.locations" :key="location"
+                    ><option :value="location" x-text="location"></option
+                  ></template>
+                </select>
+              </label>
+              <label
+                >Destination
+                <select x-model="newPackage.destination" required>
+                  <template x-for="location in campus.locations" :key="location"
+                    ><option :value="location" x-text="location"></option
+                  ></template>
+                </select>
+              </label>
+              <button type="submit">Add package</button>
+            </form>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </body>
+</html>
